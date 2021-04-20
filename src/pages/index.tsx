@@ -1,5 +1,7 @@
 import { GetStaticProps } from 'next';
-
+import Prismic from '@prismicio/client';
+import Head from 'next/head';
+import Link from 'next/link';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -24,13 +26,62 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home(): JSX.Element {
-  return <h1>Hello World</h1>;
+export default function Home({ postsPagination }: HomeProps): JSX.Element {
+  return (
+    <>
+      <Head>
+        <title>Posts - Spacetraveling</title>
+      </Head>
+      <main className={styles.container}>
+        <div className={styles.posts}>
+          {postsPagination.results.map(post => (
+            <Link href={`posts/${post.uid}`}>
+              <a key={post.uid}>
+                <strong>{post.data.title}</strong>
+                <p>{post.data.subtitle}</p>
+                <time>{post.first_publication_date}</time>
+                <p>{post.data.author}</p>
+              </a>
+            </Link>
+          ))}
+        </div>
+      </main>
+    </>
+  );
 }
 
-// export const getStaticProps = async () => {
-//   // const prismic = getPrismicClient();
-//   // const postsResponse = await prismic.query(TODO);
+export const getStaticProps: GetStaticProps = async () => {
+  const prismic = getPrismicClient();
+  const postsResponse = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      fetch: ['posts.title', 'posts.subtitle', 'posts.author', 'posts.content'],
+      pageSize: 20,
+    }
+  );
+  const posts = postsResponse.results.map(post => {
+    return {
+      uid: post.uid,
+      first_publication_date: new Date(
+        post.first_publication_date
+      ).toLocaleDateString('en-CA', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }),
+      data: {
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
+      },
+    };
+  });
 
-//   // TODO
-// };
+  return {
+    props: {
+      postsPagination: {
+        results: posts,
+      },
+    },
+  };
+};
