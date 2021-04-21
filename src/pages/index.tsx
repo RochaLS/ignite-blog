@@ -2,6 +2,7 @@ import { GetStaticProps } from 'next';
 import Prismic from '@prismicio/client';
 import Head from 'next/head';
 import Link from 'next/link';
+import { FiCalendar, FiUser } from 'react-icons/fi';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -38,9 +39,13 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             <Link href={`posts/${post.uid}`}>
               <a key={post.uid}>
                 <strong>{post.data.title}</strong>
-                <p>{post.data.subtitle}</p>
-                <time>{post.first_publication_date}</time>
-                <p>{post.data.author}</p>
+                <p className={styles.subtitle}>{post.data.subtitle}</p>
+                <div className={styles.postInfo}>
+                  <FiCalendar />
+                  <time>{post.first_publication_date}</time>
+                  <FiUser />
+                  <p>{post.data.author}</p>
+                </div>
               </a>
             </Link>
           ))}
