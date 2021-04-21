@@ -10,6 +10,7 @@ import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import Header from '../components/Header';
 
 interface Post {
   uid?: string;
@@ -68,6 +69,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
       <Head>
         <title>Posts - Spacetraveling</title>
       </Head>
+      <Header />
       <main className={styles.container}>
         <div className={styles.posts}>
           {posts.map(post => (
@@ -77,7 +79,15 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
                 <p className={styles.subtitle}>{post.data.subtitle}</p>
                 <div className={styles.postInfo}>
                   <FiCalendar />
-                  <time>{post.first_publication_date}</time>
+                  <time>
+                    {format(
+                      new Date(post.first_publication_date),
+                      'dd MMM yyyy',
+                      {
+                        locale: ptBR,
+                      }
+                    )}
+                  </time>
                   <FiUser />
                   <p>{post.data.author}</p>
                 </div>
@@ -112,11 +122,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const posts = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: format(
-        new Date(post.first_publication_date),
-        'dd MMM yyyy',
-        { locale: ptBR }
-      ),
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,
