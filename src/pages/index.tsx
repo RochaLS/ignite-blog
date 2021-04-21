@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import { useState } from 'react';
 import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -90,7 +91,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             onClick={handleLoadMorePosts}
             className={styles.loadPostsButton}
           >
-            Load more posts
+            Carregar mais posts
           </button>
         )}
       </main>
@@ -113,7 +114,8 @@ export const getStaticProps: GetStaticProps = async () => {
       uid: post.uid,
       first_publication_date: format(
         new Date(post.first_publication_date),
-        'MMMM dd yyyy'
+        'dd MMM yyyy',
+        { locale: ptBR }
       ),
       data: {
         title: post.data.title,
