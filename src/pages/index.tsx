@@ -50,6 +50,11 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </Link>
           ))}
         </div>
+        {postsPagination.next_page && (
+          <button type="button" className={styles.loadPostsButton}>
+            Load more posts
+          </button>
+        )}
       </main>
     </>
   );
@@ -61,7 +66,7 @@ export const getStaticProps: GetStaticProps = async () => {
     [Prismic.Predicates.at('document.type', 'posts')],
     {
       fetch: ['posts.title', 'posts.subtitle', 'posts.author', 'posts.content'],
-      pageSize: 20,
+      pageSize: 1,
     }
   );
   const posts = postsResponse.results.map(post => {
@@ -86,6 +91,7 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       postsPagination: {
         results: posts,
+        next_page: postsResponse.next_page,
       },
     },
   };

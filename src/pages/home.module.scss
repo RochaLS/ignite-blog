@@ -2,6 +2,21 @@
   max-width: 1120px;
   margin: 0 auto;
   padding: 0 2rem;
+
+  .loadPostsButton {
+    margin-top: 5rem;
+    font-weight: 600;
+    font-size: 1.125rem;
+    background: transparent;
+    border: none;
+    color: var(--pink-500);
+
+    transition: text-decoration 0.2s;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .posts {
@@ -10,6 +25,8 @@
   a {
     display: block;
     margin-top: 5rem;
+
+    transition: color 0.2s;
 
     & + a {
       margin-top: 2rem;
@@ -44,6 +61,10 @@
       svg:not(:first-child) {
         margin-left: 2rem;
       }
+    }
+
+    &:hover {
+      color: var(--pink-500);
     }
   }
 }
