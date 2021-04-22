@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
 
-import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import Header from '../../components/Header';
 
@@ -51,12 +50,16 @@ export default function Post({ post }: PostProps): JSX.Element {
       };
     });
 
+    let headingWordsCount = 0;
     let bodyWordsCount = 0;
-
-    words[0].bodyWords.forEach(array => {
-      bodyWordsCount += array.length;
+    words.forEach(wordsObject => {
+      wordsObject.bodyWords.forEach(array => {
+        bodyWordsCount += array.length;
+      });
+      headingWordsCount += wordsObject.headingWords.length;
     });
-    return Math.ceil((words[0].headingWords.length + bodyWordsCount) / 200);
+
+    return Math.ceil((headingWordsCount + bodyWordsCount) / 200);
   }
 
   return (
@@ -132,11 +135,13 @@ export const getStaticProps: GetStaticProps = async context => {
   const response = await prismic.getByUID('posts', String(slug), {});
 
   const post = {
+    uid: response.uid,
     first_publication_date: response.first_publication_date,
     data: {
       title: response.data.title,
+      subtitle: response.data.subtitle,
       banner: {
-        url: response.data.image.url,
+        url: response.data.banner.url,
       },
       author: response.data.author,
       content: response.data.content.map(item => {
@@ -152,6 +157,5 @@ export const getStaticProps: GetStaticProps = async context => {
     props: {
       post,
     },
-    revalidate: 60 * 30,
   };
 };

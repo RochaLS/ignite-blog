@@ -8,7 +8,6 @@ import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { getPrismicClient } from '../services/prismic';
 
-import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import Header from '../components/Header';
 
@@ -56,10 +55,10 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
           },
         };
       });
-      console.log(next_page);
       setPosts([...posts, ...newPosts]);
       setNextPage(next_page);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   }
