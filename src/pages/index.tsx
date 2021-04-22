@@ -41,13 +41,13 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
       const newPosts = results.map(post => {
         return {
           uid: post.uid,
-          first_publication_date: new Date(
-            post.first_publication_date
-          ).toLocaleDateString('en-CA', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-          }),
+          first_publication_date: format(
+            new Date(post.first_publication_date),
+            'dd MMM yyyy',
+            {
+              locale: ptBR,
+            }
+          ),
           data: {
             title: post.data.title,
             subtitle: post.data.subtitle,
