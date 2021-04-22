@@ -93,7 +93,7 @@ export default function Post({ post }: PostProps): JSX.Element {
             <span>{`${calculateReadingTime()} min`}</span>
           </div>
           {post.data.content.map(({ heading, body }) => (
-            <>
+            <div key={heading}>
               <h3 className={styles.contentHeading}>{heading}</h3>
               <div
                 className={styles.postContent}
@@ -101,7 +101,7 @@ export default function Post({ post }: PostProps): JSX.Element {
                   __html: RichText.asHtml(body),
                 }}
               />
-            </>
+            </div>
           ))}
         </article>
       </main>
