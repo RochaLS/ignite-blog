@@ -5,6 +5,8 @@ import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { RichText } from 'prismic-dom';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+import { useRouter } from 'next/router';
+import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -33,6 +35,12 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps): JSX.Element {
+  const router = useRouter();
+
+  if (router.isFallback) {
+    return <div>Carregando...</div>;
+  }
+
   function calculateReadingTime(): number {
     const words = post.data.content.map(item => {
       return {
@@ -99,12 +107,21 @@ export default function Post({ post }: PostProps): JSX.Element {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // const prismic = getPrismicClient();
-  // const posts = await prismic.query(TODO);
+  const prismic = getPrismicClient();
+  const posts = await prismic.query(
+    Prismic.Predicates.at('document.type', 'posts')
+  );
 
+  const slugs = posts.results.map(post => {
+    return {
+      params: {
+        slug: post.uid,
+      },
+    };
+  });
   return {
-    paths: [],
-    fallback: 'blocking',
+    paths: slugs,
+    fallback: true,
   };
 };
 
@@ -135,5 +152,6 @@ export const getStaticProps: GetStaticProps = async context => {
     props: {
       post,
     },
+    revalidate: 60 * 30,
   };
 };
