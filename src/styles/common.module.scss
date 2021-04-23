@@ -1,1 +1,12 @@
-// TODO
+.previewButtonContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-800);
+  font-weight: 600;
+  width: 80%;
+  height: 3.625rem;
+  background-color: var(--gray-100);
+  border-radius: 4px;
+  margin: 3rem auto;
+}
