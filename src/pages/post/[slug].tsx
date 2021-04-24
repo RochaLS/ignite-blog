@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 /* eslint-disable react/no-danger */
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
@@ -18,6 +19,7 @@ import Comments from '../../components/Comments';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -36,9 +38,27 @@ interface Post {
 interface PostProps {
   post: Post;
   preview: boolean;
+  navigation: {
+    prevPost: {
+      uid: string;
+      data: {
+        title: string;
+      };
+    };
+    nextPost: {
+      uid: string;
+      data: {
+        title: string;
+      };
+    };
+  };
 }
 
-export default function Post({ post, preview }: PostProps): JSX.Element {
+export default function Post({
+  post,
+  preview,
+  navigation,
+}: PostProps): JSX.Element {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -65,6 +85,24 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
     });
 
     return Math.ceil((headingWordsCount + bodyWordsCount) / 200);
+  }
+
+  const shouldHidePrevPost = navigation.prevPost.uid ? false : true;
+  const shouldHideNextPost = navigation.nextPost.uid ? false : true;
+
+  const wasPostEdited =
+    post.first_publication_date !== post.last_publication_date;
+
+  let editedPostLabel = '';
+
+  if (wasPostEdited) {
+    editedPostLabel = format(
+      new Date(post.last_publication_date),
+      "'* editado em' dd MMM yyyy', às' H':'m",
+      {
+        locale: ptBR,
+      }
+    );
   }
 
   return (
@@ -97,6 +135,7 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
             <FiClock />
             <span>{`${calculateReadingTime()} min`}</span>
           </div>
+          <span className={styles.editedLabel}>{editedPostLabel}</span>
           {post.data.content.map(({ heading, body }) => (
             <div key={heading}>
               <h3 className={styles.contentHeading}>{heading}</h3>
@@ -109,6 +148,21 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
             </div>
           ))}
         </article>
+        <hr />
+        <section className={styles.navigation}>
+          <div className={shouldHidePrevPost ? styles.hidden : ''}>
+            <h4>{navigation.prevPost.data.title}</h4>
+            <Link href={`${navigation.prevPost.uid}`}>
+              <a className={styles.prevPostAnchor}>Post anterior</a>
+            </Link>
+          </div>
+          <div className={shouldHideNextPost ? styles.hidden : ''}>
+            <h4>{navigation.nextPost.data.title}</h4>
+            <Link href={`${navigation.nextPost.uid}`}>
+              <a>Próximo post</a>
+            </Link>
+          </div>
+        </section>
         <Comments />
         {preview && (
           <aside className={commonStyles.previewButtonContainer}>
@@ -153,9 +207,42 @@ export const getStaticProps: GetStaticProps = async ({
     ref: previewData?.ref ?? null,
   });
 
+  const prevPostResponse = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      pageSize: 1,
+      after: response.id,
+      orderings: '[document.first_publication_date]',
+    }
+  );
+
+  const nextPostResponse = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      pageSize: 1,
+      after: response.id,
+      orderings: '[document.last_publication_date desc]',
+    }
+  );
+
+  const prevPost = {
+    uid: prevPostResponse.results[0]?.uid ?? null,
+    data: {
+      title: prevPostResponse.results[0]?.data.title ?? null,
+    },
+  };
+
+  const nextPost = {
+    uid: nextPostResponse.results[0]?.uid ?? null,
+    data: {
+      title: nextPostResponse.results[0]?.data.title ?? null,
+    },
+  };
+
   const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
+    last_publication_date: response.last_publication_date,
     data: {
       title: response.data.title,
       subtitle: response.data.subtitle,
@@ -176,6 +263,10 @@ export const getStaticProps: GetStaticProps = async ({
     props: {
       post,
       preview,
+      navigation: {
+        prevPost,
+        nextPost,
+      },
     },
   };
 };

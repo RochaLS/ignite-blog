@@ -2,6 +2,38 @@
   max-width: 1120px;
   margin: 0 auto;
   padding: 0 2rem;
+
+  hr {
+    margin-top: 3rem;
+    border: 0.5px solid var(--gray-450);
+    opacity: 0.1;
+  }
+
+  .navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 3rem;
+    margin-bottom: 5rem;
+
+    h4 {
+      font-weight: 400;
+      color: var(--gray-100);
+      font-size: 1.25rem;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 0.5rem;
+      color: var(--pink-500);
+      text-align: right;
+      width: 100%;
+    }
+
+    .prevPostAnchor {
+      text-align: left;
+    }
+  }
 }
 
 .post {
@@ -31,6 +63,12 @@
     svg:not(:first-child) {
       margin-left: 1.5rem;
     }
+  }
+
+  .editedLabel {
+    display: inline-block;
+    color: var(--gray-500);
+    margin-top: 1.5rem;
   }
 
   .contentHeading {
@@ -70,4 +108,8 @@
     height: 100%;
     object-fit: cover;
   }
+}
+
+.hidden {
+  visibility: hidden;
 }
